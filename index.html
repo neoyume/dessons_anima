@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Trait Live</title>
+<title>dessons_anima</title>
 <style>
 /* DotGothic16 (SIL OFL, fonts/OFL.txt), servie en local comme dans Dessons : aucune requête à Google */
 @font-face{font-family:'DotGothic16';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/DotGothic16-latin.woff2) format('woff2');
@@ -146,7 +146,7 @@ select:hover{border-color:var(--accent)}
 <body>
 <div id="app">
   <header>
-    <div class="logo"><i></i>Trait Live</div>
+    <div class="logo"><i></i>dessons_anima</div>
     <button class="btn" id="bOpen">Ouvrir une vidéo</button>
     <div class="sp"></div>
     <button class="btn ic narrowOnly" id="bUndo" title="Annuler"><svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62A7.9 7.9 0 0 1 12.5 10.5c3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button>
@@ -606,6 +606,7 @@ vid.addEventListener('loadeddata', () => { if (vid.currentTime === 0) vid.curren
 vid.addEventListener('error', () => { if (vid.src) toast('Safari ne sait pas lire ce fichier vidéo', 3500); });
 
 // ---------- save / load ----------
+// 'traitlive' stays the internal id (autosave keys, .json format) so older saves and projects still load
 const key = () => 'traitlive:' + fileName + ':' + (dur || 0).toFixed(2);
 function serialize() {
   const r1 = v => Math.round(v * 10) / 10, r2 = v => Math.round(v * 100) / 100, r4 = v => Math.round(v * 10000) / 10000;
@@ -672,14 +673,14 @@ $('#bPanel').onclick = () => $('#panel').classList.toggle('open');
 $('#pSave').onclick = async () => {
   closePops(); if (!ready) return toast("Ouvre d'abord une vidéo");
   if (!strokes.length) return toast('Aucun trait à enregistrer');
-  try { const r = await saveFile(baseName() + '_traitlive.json', new Blob([serialize()], { type:'application/json' }));
+  try { const r = await saveFile(baseName() + '_dessons_anima.json', new Blob([serialize()], { type:'application/json' }));
     if (r === 'declined') toast('Enregistrement annulé'); else if (r === 'busy') toast('Une fenêtre est déjà ouverte, réessaie'); }
   catch (e) { toast("Impossible d'enregistrer (" + e.message + ')'); }
 };
 $('#pLoad').onclick = () => { closePops(); if (!ready) return toast("Ouvre d'abord la vidéo correspondante"); $('#fProj').click(); };
 $('#fProj').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try { const n = deserialize(JSON.parse(await f.text())); toast(`${n} traits chargés`); } catch (_) { toast("Ce fichier n'est pas un projet Trait Live"); }
+  try { const n = deserialize(JSON.parse(await f.text())); toast(`${n} traits chargés`); } catch (_) { toast("Ce fichier n'est pas un projet dessons_anima"); }
 };
 
 // ---------- panel controls ----------

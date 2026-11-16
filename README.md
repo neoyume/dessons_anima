@@ -1,4 +1,4 @@
-# Trait Live
+# dessons_anima
 
 **[Essayer en ligne → neoyume.github.io/dessons_anima](https://neoyume.github.io/dessons_anima/)**
 
@@ -47,7 +47,7 @@ Les réglages s'appliquent aux nouveaux traits. Sur grand écran, les réglages 
 
 ## Enregistrer et exporter
 
-- **Sauvegarde automatique** : les traits sont gardés dans le navigateur pour chaque vidéo. En rouvrant la même vidéo, Trait Live propose de les restaurer.
+- **Sauvegarde automatique** : les traits sont gardés dans le navigateur pour chaque vidéo. En rouvrant la même vidéo, dessons_anima propose de les restaurer.
 - **Projet** → *Enregistrer* : un fichier `.json` avec tous les traits, à recharger plus tard sur la même vidéo. Plus sûr que la sauvegarde du navigateur.
 - **Exporter** :
   - *Vidéo + dessins* (`.mp4`, ou `.webm` selon le navigateur), avec le son en option ;
@@ -62,6 +62,6 @@ Pensé pour Safari sur iPad avec l'Apple Pencil ; marche aussi dans un navigateu
 
 ## Licences
 
-Code source disponible sous [PolyForm Noncommercial 1.0.0](LICENSE), comme Dessons : libre pour un usage personnel, l'apprentissage, la recherche ou une association, mais pas pour un usage commercial. Les dessins et vidéos que tu crées avec Trait Live t'appartiennent entièrement, la licence ne les couvre pas.
+Code source disponible sous [PolyForm Noncommercial 1.0.0](LICENSE), comme Dessons : libre pour un usage personnel, l'apprentissage, la recherche ou une association, mais pas pour un usage commercial. Les dessins et vidéos que tu crées avec dessons_anima t'appartiennent entièrement, la licence ne les couvre pas.
 
 La police DotGothic16 est sous [SIL Open Font License](fonts/OFL.txt).
