@@ -62,4 +62,6 @@ Pensé pour Safari sur iPad avec l'Apple Pencil ; marche aussi dans un navigateu
 
 ## Licences
 
+Code source disponible sous [PolyForm Noncommercial 1.0.0](LICENSE), comme Dessons : libre pour un usage personnel, l'apprentissage, la recherche ou une association, mais pas pour un usage commercial. Les dessins et vidéos que tu crées avec Trait Live t'appartiennent entièrement, la licence ne les couvre pas.
+
 La police DotGothic16 est sous [SIL Open Font License](fonts/OFL.txt).
