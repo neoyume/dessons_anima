@@ -250,7 +250,7 @@ select:hover{border-color:var(--accent)}
     <button class="btn on hide-s" id="bLoop" title="Boucle">Boucle</button>
     <button class="btn hide-s" id="bMute" title="Son">Son</button>
     <select id="sFps" title="Cadence (images/s)">
-      <option value="12">12 i/s</option><option value="15">15 i/s</option><option value="23.976">23,976</option><option value="24">24 i/s</option><option value="25">25 i/s</option><option value="29.97">29,97</option><option value="30" selected>30 i/s</option><option value="50">50 i/s</option><option value="59.94">59,94</option><option value="60">60 i/s</option>
+      <option value="10">10 i/s</option><option value="12">12 i/s</option><option value="15">15 i/s</option><option value="23.976">23,976</option><option value="24">24 i/s</option><option value="25">25 i/s</option><option value="29.97">29,97</option><option value="30" selected>30 i/s</option><option value="50">50 i/s</option><option value="59.94">59,94</option><option value="60">60 i/s</option>
     </select>
   </footer>
 </div>
@@ -446,7 +446,7 @@ function redo() {
 }
 
 // ---------- input ----------
-let active = null, rect = null, sm = null, lastT = 0, eraseGroup = null;
+let active = null, activeType = null, rect = null, sm = null, lastT = 0, eraseGroup = null;
 const touches = new Map(); let tap = null;
 const pres = e => e.pointerType === 'pen' ? (e.pressure || 0.5) : 1;
 const toVid = e => ({ x:(e.clientX - rect.left) / rect.width * vw, y:(e.clientY - rect.top) / rect.height * vh });
@@ -488,7 +488,14 @@ function eraseAt(e) {
     if (hit) { strokes.splice(i, 1); eraseGroup.push({ s, idx:i }); dirty = true; stripDirty = true; }
   }
 }
-cv.addEventListener('pointerdown', e => {
+function finishActive() {
+  if (active === null) return;
+  const id = active; active = null; activeType = null;
+  try { if (cv.hasPointerCapture(id)) cv.releasePointerCapture(id); } catch (_) {}
+  if (S.tool === 'eraser') { if (eraseGroup && eraseGroup.length) pushHist({ type:'erase', items:eraseGroup }); eraseGroup = null; }
+  else endStroke();
+}
+function down(e) {
   if (!ready || exporting) return;
   e.preventDefault();
   if (e.pointerType === 'touch' && S.pencilOnly) {
@@ -496,13 +503,19 @@ cv.addEventListener('pointerdown', e => {
     touches.set(e.pointerId, { x:e.clientX, y:e.clientY }); tap.max = Math.max(tap.max, touches.size); return;
   }
   if (e.pointerType === 'mouse' && e.button !== 0) return;
-  if (active !== null) return;
-  active = e.pointerId; rect = cv.getBoundingClientRect();
+  if (active !== null) {
+    // a stylus always wins: a missed pointerup (or a palm touch that started first) must never block it
+    if (e.pointerType === 'pen' || activeType === e.pointerType) finishActive(); else return;
+  }
+  active = e.pointerId; activeType = e.pointerType; rect = cv.getBoundingClientRect();
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
   if (S.tool === 'eraser') { eraseGroup = []; eraseAt(e); } else startStroke(e);
-});
+}
+cv.addEventListener('pointerdown', down);
 cv.addEventListener('pointermove', e => {
   if (touches.has(e.pointerId)) { const o = touches.get(e.pointerId); if (Math.hypot(e.clientX - o.x, e.clientY - o.y) > 12 && tap) tap.moved = true; return; }
+  // pointerdown swallowed by the browser (fast successive strokes on iPad): pick the stroke up on the first contact move
+  if (e.pointerId !== active && e.pointerType === 'pen' && (e.buttons & 1)) { down(e); return; }
   if (e.pointerId !== active) return;
   e.preventDefault();
   if (S.tool === 'eraser') eraseAt(e); else if (cur) moveStroke(e);
@@ -516,11 +529,12 @@ function up(e) {
     return;
   }
   if (e.pointerId !== active) return;
-  active = null;
-  if (S.tool === 'eraser') { if (eraseGroup && eraseGroup.length) pushHist({ type:'erase', items:eraseGroup }); eraseGroup = null; }
-  else endStroke();
+  finishActive();
 }
-cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.addEventListener('lostpointercapture', up);
+// iPad: without a non-passive preventDefault on touch events, WebKit's double-tap / long-press / loupe
+// recognisers can delay or eat Apple Pencil strokes (pointer events still fire normally afterwards)
+for (const ev of ['touchstart', 'touchmove', 'touchend']) cv.addEventListener(ev, e => { if (e.cancelable) e.preventDefault(); }, { passive:false });
 document.addEventListener('gesturestart', e => e.preventDefault());
 document.addEventListener('dblclick', e => e.preventDefault());
 
